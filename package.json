@@ -1,0 +1,37 @@
+{
+  "name": "@razvanz/service-error",
+  "version": "0.0.0",
+  "description": "Utility for better error management in NodeJS",
+  "main": "src/create-service-error.js",
+  "scripts": {
+    "test": "mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/razvanz/node-service-error.git"
+  },
+  "keywords": [
+    "error",
+    "nodejs",
+    "service",
+    "service-error",
+    "server-error",
+    "express"
+  ],
+  "author": "Razvan Laurus <razvanlaurus@gmail.com>",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/razvanz/node-service-error/issues"
+  },
+  "homepage": "https://github.com/razvanz/node-service-error#readme",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "eslint": "^4.7.2",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.1.1",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "mocha": "^3.5.3"
+  }
+}
