@@ -86,3 +86,9 @@ serviceError('E_RANDOM_FAIL', innerError, 'descriptive message here ...', payloa
   raw_data: [ 'descriptive message here ...', { data: 'value' } ] }
  */
 ```
+
+Changelog
+---------
+
+- v1.0.0
+  - Initial functionality

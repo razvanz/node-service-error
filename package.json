@@ -1,6 +1,6 @@
 {
   "name": "@razvanz/service-error",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Utility for better error management in NodeJS",
   "main": "src/create-service-error.js",
   "scripts": {
