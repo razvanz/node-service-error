@@ -90,5 +90,7 @@ serviceError('E_RANDOM_FAIL', innerError, 'descriptive message here ...', payloa
 Changelog
 ---------
 
+- v1.0.1
+  - fix: enforce engine `node@^6.0.0` (#2)
 - v1.0.0
   - Initial functionality
