@@ -2,8 +2,11 @@
   "name": "@razvanz/service-error",
   "version": "1.0.0",
   "description": "Utility for better error management in NodeJS",
-  "main": "src/create-service-error.js",
+  "main": "build/create-service-error.js",
   "scripts": {
+    "prebuild": "npm run clean",
+    "build": "node_modules/.bin/babel src --out-dir build --copy-files",
+    "clean": "rm -rf build/",
     "test": "mocha test"
   },
   "repository": {
@@ -25,6 +28,8 @@
   },
   "homepage": "https://github.com/razvanz/node-service-error#readme",
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
     "chai": "^4.1.2",
     "eslint": "^4.7.2",
     "eslint-config-standard": "^10.2.1",
