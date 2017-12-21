@@ -1,6 +1,11 @@
 const util = require('util')
 
 const FORMAT_PLACEHOLDERS_REG_EXP = /%s|%d|%j/g
+const DEFAULT_ERROR = {
+  code: 'E_INTERNAL',
+  name: 'InternalError',
+  message: 'Internal error'
+}
 
 class ServiceError extends Error {
   constructor (error, innerError, ...args) {
@@ -17,34 +22,59 @@ class ServiceError extends Error {
       : error.message
 
     super(message)
-    this.code = error.code
     this.name = error.name
-    this.inner_error = innerError
-    this.status_code = error.status_code || (innerError && innerError.status) || 500
+    this.code = error.code
     this.raw_message = error.message
     this.raw_data = args
+    this.inner_error = innerError
   }
 
   toJSON () {
     return {
-      code: this.code,
       name: this.name,
+      code: this.code,
       message: this.message,
-      stack: this.stack,
-      inner_error: this.serializeError(this.inner_error),
-      status_code: this.status_code,
       raw_message: this.raw_message,
-      raw_data: this.raw_data
+      raw_data: this.raw_data,
+      inner_error: this.inner_error && Object.assign({
+        name: this.inner_error.name,
+        code: this.inner_error.code,
+        message: this.inner_error.message
+      }, this.inner_error)
     }
   }
 
-  serializeError (e) {
-    return e && Object.assign({
-      name: e.name,
-      message: e.message,
-      code: e.code,
-      stack: e.stack
-    }, e)
+  toString () {
+    const error = Object.assign(this.toJSON(), { stack: this.stack })
+
+    if (error.inner_error) { // if there is an inner error add it's stack too
+      error.inner_error = Object.assign(error.inner_error, { stack: this.inner_error.stack })
+    }
+
+    return util.inspect(error, { depth: 4 })
+  }
+
+  static factory (ERRORS) {
+    if (!ERRORS || typeof ERRORS !== 'object') {
+      throw new Error(`Invalid ERROR_MAP value "${ERRORS}"`)
+    }
+
+    return (error, innerError, ...args) => {
+      if (typeof error === 'string') {
+        error = ERRORS[error]
+      }
+
+      if (!error || !(error.code in ERRORS)) {
+        innerError = error || innerError
+        error = DEFAULT_ERROR
+      }
+
+      return new this.prototype.constructor(error, innerError, ...args)
+    }
+  }
+
+  static get DEFAULT_ERROR () {
+    return DEFAULT_ERROR
   }
 }
 
