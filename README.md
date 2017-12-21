@@ -120,6 +120,8 @@ createHttpError('E_NOT_FOUND', '/url-path')
 Changelog
 ---------
 
+- v2.0.1
+  - republish to npm
 - v2.0.0
   - feat: improve interface to allow inheritance (#4)
 - v1.0.2
