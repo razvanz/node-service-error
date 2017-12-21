@@ -23,8 +23,19 @@ describe('module', () => {
   it('exposes E_INTERNAL', () =>
     assert.isDefined(createServiceError.E_INTERNAL))
 
+  describe('with custom type', () => {
+    class MyError extends ServiceError {}
+    const createMyError = createServiceError.bind(null, MyError, ERROR_MAP)
+
+    it('creates a MyError', () => {
+      const error = createMyError('E_SPECIFIC_FAIL')
+      assert.instanceOf(error, MyError)
+      assert.equal(error.code, 'E_SPECIFIC_FAIL')
+    })
+  })
+
   describe('with error map', () => {
-    const createFromMap = createServiceError.bind(null, ERROR_MAP)
+    const createFromMap = createServiceError.bind(null, null, ERROR_MAP)
 
     describe('with known error string', () => {
       const createWithString = createFromMap.bind(null, 'E_SPECIFIC_FAIL')
@@ -117,15 +128,33 @@ describe('module', () => {
       assert.equal(serialized.code, 'E_RANDOM_FAIL')
       assert.equal(serialized.name, 'RandomFailError')
       assert.equal(serialized.message, 'failure message')
-      assert.equal(serialized.status_code, 500)
       assert.equal(serialized.raw_message, '%s')
       assert.deepEqual(serialized.raw_data, ['failure message', { 'data': 1 }])
-      assert.isDefined(serialized.stack)
       assert.isDefined(serialized.inner_error)
       assert.equal(serialized.inner_error.name, 'Error')
       assert.equal(serialized.inner_error.message, 'fail')
       assert.equal(serialized.inner_error.code, 'inner_code')
-      assert.isDefined(serialized.inner_error.stack)
+    })
+
+    it('serializes to string', () => {
+      const innerE = new Error('fail')
+      innerE.code = 'inner_code'
+      const error = new ServiceError(
+        ERROR_MAP.E_RANDOM_FAIL, innerE, 'failure message', { data: 1 }
+      )
+      const serialized = `${error}`
+
+      assert.typeOf(serialized, 'string')
+      // error
+      assert.match(serialized, /code: 'E_RANDOM_FAIL'/)
+      assert.match(serialized, /name: 'RandomFailError'/)
+      assert.match(serialized, /message: 'failure message'/)
+      assert.match(serialized, /stack: 'RandomFailError: failure message.*/)
+      // inner error
+      assert.match(serialized, /name: 'Error'/)
+      assert.match(serialized, /code: 'inner_code'/)
+      assert.match(serialized, /message: 'fail/)
+      assert.match(serialized, /stack: 'Error: fail.*/)
     })
   })
 })

@@ -17,34 +17,43 @@ class ServiceError extends Error {
       : error.message
 
     super(message)
-    this.code = error.code
     this.name = error.name
-    this.inner_error = innerError
-    this.status_code = error.status_code || (innerError && innerError.status) || 500
+    this.code = error.code
     this.raw_message = error.message
     this.raw_data = args
+    this.inner_error = innerError
   }
 
   toJSON () {
     return {
-      code: this.code,
       name: this.name,
+      code: this.code,
       message: this.message,
-      stack: this.stack,
-      inner_error: this.serializeError(this.inner_error),
-      status_code: this.status_code,
       raw_message: this.raw_message,
-      raw_data: this.raw_data
+      raw_data: this.raw_data,
+      inner_error: this.inner_error && Object.assign({
+        name: this.inner_error.name,
+        code: this.inner_error.code,
+        message: this.inner_error.message
+      }, this.inner_error)
     }
   }
 
-  serializeError (e) {
-    return e && Object.assign({
-      name: e.name,
-      message: e.message,
-      code: e.code,
-      stack: e.stack
-    }, e)
+  toString () {
+    return util.inspect({
+      name: this.name,
+      code: this.code,
+      message: this.message,
+      stack: this.stack,
+      raw_message: this.raw_message,
+      raw_data: this.raw_data,
+      inner_error: this.inner_error && Object.assign({
+        name: this.inner_error.name,
+        code: this.inner_error.code,
+        message: this.inner_error.message,
+        stack: this.inner_error.stack
+      }, this.inner_error)
+    }, { depth: 4 })
   }
 }
 

@@ -90,6 +90,8 @@ serviceError('E_RANDOM_FAIL', innerError, 'descriptive message here ...', payloa
 Changelog
 ---------
 
+- next
+  - feat: allow custom error types
 - v1.0.2
   - republish to npm
 - v1.0.1

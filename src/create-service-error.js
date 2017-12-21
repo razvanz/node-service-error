@@ -5,9 +5,13 @@ const E_INTERNAL = {
   message: 'Internal error'
 }
 
-function createServiceError (ERROR_MAP, error, innerError, ...args) {
+function createServiceError (ErrorType, ERROR_MAP, error, innerError, ...args) {
   if (!ERROR_MAP || typeof ERROR_MAP !== 'object') {
     throw new Error(`Invalid ERROR_MAP value "${ERROR_MAP}"`)
+  }
+
+  if (!ErrorType) {
+    ErrorType = ServiceError
   }
 
   if (typeof error === 'string') {
@@ -19,7 +23,7 @@ function createServiceError (ERROR_MAP, error, innerError, ...args) {
     error = E_INTERNAL
   }
 
-  return new ServiceError(error, innerError, ...args)
+  return new ErrorType(error, innerError, ...args)
 }
 
 module.exports = createServiceError
