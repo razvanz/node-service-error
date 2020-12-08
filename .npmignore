@@ -1,0 +1,7 @@
+src/
+test/
+.editorconfig
+.eslintrc.yml
+.mocharc.yml
+.tsconfig.json
+.tsconfig.build.json

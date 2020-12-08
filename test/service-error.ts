@@ -1,5 +1,5 @@
-const { assert } = require('chai')
-const ServiceError = require('../src/service-error')
+import { assert } from 'chai'
+import { ServiceError, ErrorDefinition } from '../src/service-error'
 
 const ERROR_MAP = {
   E_SPECIFIC_FAIL: {
@@ -24,7 +24,7 @@ describe('module', () => {
 
   describe('ServiceError', () => {
     it('serializes to JSON', () => {
-      const innerE = new Error('fail')
+      const innerE: Error & { code?: string } = new Error('fail')
       innerE.code = 'inner_code'
       const error = new ServiceError(
         ERROR_MAP.E_RANDOM_FAIL, innerE, 'failure message', { data: 1 }
@@ -34,16 +34,15 @@ describe('module', () => {
       assert.equal(serialized.code, 'E_RANDOM_FAIL')
       assert.equal(serialized.name, 'RandomFailError')
       assert.equal(serialized.message, 'failure message')
-      assert.equal(serialized.raw_message, '%s')
-      assert.deepEqual(serialized.raw_data, ['failure message', { 'data': 1 }])
-      assert.isDefined(serialized.inner_error)
-      assert.equal(serialized.inner_error.name, 'Error')
-      assert.equal(serialized.inner_error.message, 'fail')
-      assert.equal(serialized.inner_error.code, 'inner_code')
+      assert.deepEqual(serialized.data, ['failure message', { data: 1 }])
+      assert.isDefined(serialized.innerError)
+      assert.equal(serialized.innerError.name, 'Error')
+      assert.equal(serialized.innerError.message, 'fail')
+      assert.equal(serialized.innerError.code, 'inner_code')
     })
 
     it('serializes to string', () => {
-      const innerE = new Error('fail')
+      const innerE: Error & { code?: string } = new Error('fail')
       innerE.code = 'inner_code'
       const error = new ServiceError(
         ERROR_MAP.E_RANDOM_FAIL, innerE, 'failure message', { data: 1 }
@@ -52,15 +51,13 @@ describe('module', () => {
 
       assert.typeOf(serialized, 'string')
       // error
+      assert.match(serialized, /RandomFailError/)
+      assert.match(serialized, /failure message/)
       assert.match(serialized, /code: 'E_RANDOM_FAIL'/)
-      assert.match(serialized, /name: 'RandomFailError'/)
-      assert.match(serialized, /message: 'failure message'/)
-      assert.match(serialized, /stack: 'RandomFailError: failure message.*/)
+      assert.match(serialized, /data: [ 'failure message', { data: 1 } ]/)
       // inner error
-      assert.match(serialized, /name: 'Error'/)
+      assert.match(serialized, /innerError: Error: fail/)
       assert.match(serialized, /code: 'inner_code'/)
-      assert.match(serialized, /message: 'fail/)
-      assert.match(serialized, /stack: 'Error: fail.*/)
     })
   })
 
@@ -82,7 +79,7 @@ describe('module', () => {
       it('wrapps an inner error', () => {
         const innerE = new Error('fail')
         const error = createWithString(innerE)
-        assert.equal(error.inner_error, innerE)
+        assert.equal(error.innerError, innerE)
       })
 
       it('binds arguments to message', () => {
@@ -90,9 +87,9 @@ describe('module', () => {
         assert.equal(error.message, 'Fail string: 0: {"a":1}')
       })
 
-      it('stores args under raw_data', () => {
+      it('stores args under data', () => {
         const error = createWithString('string', 0, { a: 1 }, 'extra')
-        assert.deepEqual(error.raw_data, ['string', 0, { a: 1 }, 'extra'])
+        assert.deepEqual(error.data, ['string', 0, { a: 1 }, 'extra'])
       })
     })
 
@@ -108,7 +105,7 @@ describe('module', () => {
       it('wrapps an inner error', () => {
         const innerE = new Error('fail')
         const error = createWithObject(innerE)
-        assert.equal(error.inner_error, innerE)
+        assert.equal(error.innerError, innerE)
       })
 
       it('binds arguments to message', () => {
@@ -116,9 +113,9 @@ describe('module', () => {
         assert.equal(error.message, 'Fail string: 0: {"a":1}')
       })
 
-      it('stores args under raw_data', () => {
+      it('stores args under data', () => {
         const error = createWithObject('string', 0, { a: 1 }, 'extra')
-        assert.deepEqual(error.raw_data, ['string', 0, { a: 1 }, 'extra'])
+        assert.deepEqual(error.data, ['string', 0, { a: 1 }, 'extra'])
       })
     })
 
@@ -134,25 +131,26 @@ describe('module', () => {
       it('wrapps an inner error', () => {
         const innerE = new Error('fail')
         const error = createUnknown(innerE)
-        assert.equal(error.inner_error, innerE)
+        assert.equal(error.innerError, innerE)
       })
 
-      it('stores args under raw_data', () => {
+      it('stores args under data', () => {
         const error = createUnknown('string', 0, { a: 1 }, 'extra')
-        assert.deepEqual(error.raw_data, ['string', 0, { a: 1 }, 'extra'])
+        assert.deepEqual(error.data, ['string', 0, { a: 1 }, 'extra'])
       })
     })
   })
 
   describe('inheritance', () => {
-    class MyError extends ServiceError {
-      constructor (...args) {
-        super(...args)
+    class MyError extends ServiceError<Error> {
+      constructor (definition: ErrorDefinition, ...args: any) {
+        super(definition, ...args)
         this.name = 'MyError'
       }
     }
     const MY_ERRROS = {
       E_FAILURE: {
+        name: 'MyError',
         code: 'E_FAILURE',
         message: 'Something failed'
       }

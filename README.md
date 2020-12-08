@@ -26,37 +26,45 @@ const ERROR_MAP = {
     message: '%s'
   }
 }
-const ServiceError = require('@razvanz/service-error')
+const { ServiceError } = require('@razvanz/service-error')
 const createError = ServiceError.factory(ERROR_MAP)
 
 // Create a default, E_INTERNAL, error
 createError()
 
 /*
-{ InternalError: Internal error
-    at args (/Users/razvanz/workspace/github/node-service-error/src/service-error.js:72:14)
-    at repl:1:1
-    ...
-  name: 'InternalError',
+ServiceError [InternalError]: Internal error
+    at /home/razvanz/workspace/github/node-service-error/src/service-error.js:68:20
+    at Object.<anonymous> (/home/razvanz/workspace/github/node-service-error/test.js:16:13)
+    at Module._compile (internal/modules/cjs/loader.js:1200:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1220:10)
+    at Module.load (internal/modules/cjs/loader.js:1049:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:937:14)
+    at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:71:12)
+    at internal/main/run_main_module.js:17:47 {
   code: 'E_INTERNAL',
-  raw_message: 'Internal error',
-  raw_data: [],
-  inner_error: undefined }
+  data: [],
+  innerError: null
+}
 */
 
 // Create a simple error (alternatively `serviceError(ERROR_MAP.E_SIMPLE_FAIL)`)
 createError('E_SIMPLE_FAIL')
 
 /*
-{ SimpleFailError: Failed to do something simple
-    at args (/Users/razvanz/workspace/github/node-service-error/src/service-error.js:72:14)
-    at repl:1:1
-    ...
-  name: 'SimpleFailError',
+ServiceError [SimpleFailError]: Failed to do something simple
+    at /home/razvanz/workspace/github/node-service-error/src/service-error.js:68:20
+    at Object.<anonymous> (/home/razvanz/workspace/github/node-service-error/test.js:18:13)
+    at Module._compile (internal/modules/cjs/loader.js:1200:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1220:10)
+    at Module.load (internal/modules/cjs/loader.js:1049:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:937:14)
+    at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:71:12)
+    at internal/main/run_main_module.js:17:47 {
   code: 'E_SIMPLE_FAIL',
-  raw_message: 'Failed to do something simple',
-  raw_data: [],
-  inner_error: undefined }
+  data: [],
+  innerError: null
+}
 */
 
 
@@ -66,17 +74,26 @@ const payload = { data: 'value' }
 createError('E_RANDOM_FAIL', innerError, 'descriptive message here ...', payload)
 
 /*
-{ RandomFailError: descriptive message here ...
-    at args (/Users/razvanz/workspace/github/node-service-error/src/service-error.js:72:14)
-    at repl:1:1
-    ...
-  name: 'RandomFailError',
+ServiceError [RandomFailError]: descriptive message here ...
+    at /home/razvanz/workspace/github/node-service-error/src/service-error.js:68:20
+    at Object.<anonymous> (/home/razvanz/workspace/github/node-service-error/test.js:23:13)
+    at Module._compile (internal/modules/cjs/loader.js:1200:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1220:10)
+    at Module.load (internal/modules/cjs/loader.js:1049:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:937:14)
+    at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:71:12)
+    at internal/main/run_main_module.js:17:47 {
   code: 'E_RANDOM_FAIL',
-  raw_message: '%s',
-  raw_data: [ 'descriptive message here ...', { data: 'value' } ],
-  inner_error: Error: fail
-    at repl:1:20
-    ... }
+  data: [ 'descriptive message here ...', { data: 'value' } ],
+  innerError: Error: fail
+      at Object.<anonymous> (/home/razvanz/workspace/github/node-service-error/test.js:21:20)
+      at Module._compile (internal/modules/cjs/loader.js:1200:30)
+      at Object.Module._extensions..js (internal/modules/cjs/loader.js:1220:10)
+      at Module.load (internal/modules/cjs/loader.js:1049:32)
+      at Function.Module._load (internal/modules/cjs/loader.js:937:14)
+      at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:71:12)
+      at internal/main/run_main_module.js:17:47
+}
  */
 
 
@@ -104,22 +121,30 @@ const createHttpError = HttpError.factory(HTTP_ERRROS)
 
 createHttpError('E_NOT_FOUND', '/url-path')
 /*
-{ HttpError: No resource found at "/url-path"
-    at args (/Users/razvanz/workspace/github/node-service-error/src/service-error.js:72:14)
-    at repl:1:1
-    ...
-  name: 'HttpError',
+HttpError: No resource found at "/url-path"
+    at /home/razvanz/workspace/github/node-service-error/src/service-error.js:68:20
+    at Object.<anonymous> (/home/razvanz/workspace/github/node-service-error/test.js:47:13)
+    at Module._compile (internal/modules/cjs/loader.js:1200:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1220:10)
+    at Module.load (internal/modules/cjs/loader.js:1049:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:937:14)
+    at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:71:12)
+    at internal/main/run_main_module.js:17:47 {
   code: 'E_NOT_FOUND',
-  raw_message: 'No resource found at "%s"',
-  raw_data: [ '/url-path' ],
-  inner_error: null,
-  status_code: 404 }
+  data: [ '/url-path' ],
+  innerError: null,
+  status_code: 404
+}
  */
 ```
 
 Changelog
 ---------
 
+- next
+  - changed ServiceError.toJSON and ServiceError.toString implementations
+  - changed ServiceError schema
+  - rewrite in typescript
 - v2.0.1
   - republish to npm
 - v2.0.0
